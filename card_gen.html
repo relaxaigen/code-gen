@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Card Generator - V4</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: #121212;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 30px;
+            gap: 30px;
+            flex-wrap: wrap;
+            color: #dde0e3;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .controls {
+            background-color: #2a3038;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            width: 320px;
+            align-self: flex-start;
+        }
+
+        .controls h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #e0e0e0;
+            text-align: center;
+            font-weight: 500;
+            font-size: 18px;
+        }
+
+        .controls label {
+            font-weight: 400;
+            font-size: 13px;
+            color: #a0a8b3;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .controls input, .controls select {
+            width: calc(100% - 20px);
+            padding: 10px;
+            background-color: #1e2329;
+            border: 1px solid #3f454d;
+            border-radius: 4px;
+            box-sizing: border-box;
+            color: #dde0e3;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+        .controls input:focus, .controls select:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+
+        .controls button#downloadButton {
+            padding: 11px 18px;
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            margin-top: 10px;
+        }
+        .controls button#downloadButton:hover {
+            background-color: #357ABD;
+        }
+
+        .card {
+            width: 375px;
+            background-color: #1e2329;
+            color: #adb5bd;
+            padding: 16px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 2px 5px rgba(0,0,0,0.15);
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+        }
+
+        .card-header .logo {
+            color: white;
+            padding: 4px 9px;
+            border-radius: 3px;
+            font-weight: 600;
+            font-size: 15px;
+            line-height: 1;
+            margin-right: 8px;
+            flex-shrink: 0;
+        }
+        .logo.short { background-color: #ef454a; }
+        .logo.long { background-color: #0ecb81; }
+
+        .card-header .ticker-info-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            flex-grow: 1;
+            overflow: hidden;
+        }
+
+        .card-header .ticker-name {
+            font-weight: 500;
+            font-size: 15px;
+            color: #e9ecef;
+            white-space: nowrap;
+        }
+
+        .card-header .tag {
+            background-color: #2a3038;
+            padding: 2.5px 5px;
+            border-radius: 3px;
+            font-size: 11px;
+            color: #868e96;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        .card-header .alert-tag {
+            background-color: #3b4046;
+            color: #ffc107;
+            font-weight: 600;
+        }
+
+        .card-header .share-icon {
+            margin-left: auto;
+            padding-left: 8px;
+            flex-shrink: 0;
+        }
+        .card-header .share-icon svg {
+            width: 17px;
+            height: 17px;
+            fill: #6c757d;
+        }
+
+        .pnl-roi-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding-top: 4px;
+        }
+
+        /* Base style for ALL labels */
+        .pnl-roi-section .item .label,
+        .details-grid .item .label {
+            font-size: 11.5px;
+            color: #868e96;
+            margin-bottom: 5px; /* Space between label and value */
+            font-weight: 400;
+            display: inline-block; /* Affects width and allows margin */
+        }
+
+        /* Style ONLY for underlined labels */
+        .underlined-label {
+            border-bottom: 1px dotted #495057;
+            padding-bottom: 3px; /* Space for the dotted line itself */
+        }
+        
+        .pnl-roi-section .item .value {
+            font-size: 23px;
+            font-weight: 600;
+            line-height: 1.1;
+        }
+        .pnl-roi-section > .item:last-child { text-align: right; }
+
+        .pnl-roi-section .item .value.positive,
+        .details-grid .item .value.positive { color: #0ecb81; }
+        .pnl-roi-section .item .value.negative,
+        .details-grid .item .value.negative { color: #f6465d; }
+        .details-grid .item .value.liquidated { color: #f6465d; font-weight: 500;}
+
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 14px 10px;
+            padding-top: 4px;
+        }
+
+        .details-grid .item .value {
+            font-size: 13.5px;
+            color: #dee2e6;
+            font-weight: 500;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .action-buttons button {
+            flex-grow: 1;
+            padding: 9px;
+            background-color: #343a40;
+            color: #adb5bd;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+            text-align: center;
+        }
+        .action-buttons button:hover {
+            background-color: #495057;
+            color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="controls">
+        <h2>Edit Trade Card</h2>
+        <div>
+            <label for="tickerInput">Ticker (e.g., CETUSUSDT):</label>
+            <input type="text" id="tickerInput" value="CETUSUSDT">
+        </div>
+        <div>
+            <label for="entryPriceInput">Entry Price (USDT):</label>
+            <input type="number" step="any" id="entryPriceInput" value="0.3613000">
+        </div>
+        <div>
+            <label for="markPriceInput">Mark Price (USDT):</label>
+            <input type="number" step="any" id="markPriceInput" value="0.3420000">
+        </div>
+        <div>
+            <label for="positionTypeInput">Position Type:</label>
+            <select id="positionTypeInput">
+                <option value="short">Short (S)</option>
+                <option value="long">Long (B)</option>
+            </select>
+        </div>
+        <div>
+            <label for="leverageInput">Leverage (e.g., 20):</label>
+            <input type="number" id="leverageInput" value="20">
+        </div>
+        <div>
+            <label for="initialMarginInput">Initial Margin (USDT):</label>
+            <input type="number" step="any" id="initialMarginInput" value="738.50">
+        </div>
+         <div>
+            <label for="alertTagInput">Alert Tag (e.g., !!!!):</label>
+            <input type="text" id="alertTagInput" value="!!!!">
+        </div>
+        <button id="downloadButton">Download Card as PNG</button>
+    </div>
+
+    <div class="card" id="tradingCard">
+        <div class="card-header">
+            <span class="logo short" id="cardLogo">S</span>
+            <div class="ticker-info-wrapper">
+                <span class="ticker-name" id="cardTickerName">CETUSUSDT</span>
+                <span class="tag">Perp</span>
+                <span class="tag" id="cardCrossLeverage">Cross 20x</span>
+                <span class="tag alert-tag" id="cardAlertTag">!!!!</span>
+            </div>
+            <span class="share-icon">
+                <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 8.81C7.5 8.31 6.79 8 6 8c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z"></path></svg>
+            </span>
+        </div>
+
+        <div class="pnl-roi-section">
+            <div class="item">
+                <div class="label underlined-label">Unrealized PNL (USDT)</div>
+                <div class="value positive" id="cardPnl">788.99</div>
+            </div>
+            <div class="item">
+                <div class="label underlined-label">ROI</div>
+                <div class="value positive" id="cardRoi">106.84%</div>
+            </div>
+        </div>
+
+        <div class="details-grid">
+            <div class="item">
+                <span class="label underlined-label">Size (USDT)</span>
+                <span class="value" id="cardSize">14770.0000</span>
+            </div>
+            <div class="item">
+                <span class="label">Margin (USDT)</span> <!-- No 'underlined-label' class -->
+                <span class="value" id="cardMargin">738.50</span>
+            </div>
+            <div class="item">
+                <span class="label underlined-label">Margin Ratio</span>
+                <span class="value positive" id="cardMarginRatio">4.80%</span>
+            </div>
+            <div class="item">
+                <span class="label underlined-label">Entry Price (USDT)</span>
+                <span class="value" id="cardEntryPrice">0.3613000</span>
+            </div>
+            <div class="item">
+                <span class="label">Mark Price (USDT)</span> <!-- No 'underlined-label' class -->
+                <span class="value" id="cardMarkPrice">0.3420000</span>
+            </div>
+            <div class="item">
+                <span class="label">Liq. Price (USDT)</span> <!-- No 'underlined-label' class -->
+                <span class="value" id="cardLiqPrice">0.3793650</span>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button>Adjust Leverage</button>
+            <button>Stop Profit & Loss</button>
+            <button>Close Position</button>
+        </div>
+    </div>
+
+    <script>
+        const tickerInput = document.getElementById('tickerInput');
+        const entryPriceInput = document.getElementById('entryPriceInput');
+        const markPriceInput = document.getElementById('markPriceInput');
+        const positionTypeInput = document.getElementById('positionTypeInput');
+        const leverageInput = document.getElementById('leverageInput');
+        const initialMarginInput = document.getElementById('initialMarginInput');
+        const alertTagInput = document.getElementById('alertTagInput');
+
+        const cardLogo = document.getElementById('cardLogo');
+        const cardTickerName = document.getElementById('cardTickerName');
+        const cardCrossLeverage = document.getElementById('cardCrossLeverage');
+        const cardAlertTag = document.getElementById('cardAlertTag');
+        const cardPnl = document.getElementById('cardPnl');
+        const cardRoi = document.getElementById('cardRoi');
+        const cardSize = document.getElementById('cardSize');
+        const cardMargin = document.getElementById('cardMargin');
+        const cardMarginRatio = document.getElementById('cardMarginRatio');
+        const cardEntryPrice = document.getElementById('cardEntryPrice');
+        const cardMarkPrice = document.getElementById('cardMarkPrice');
+        const cardLiqPrice = document.getElementById('cardLiqPrice');
+        const downloadButton = document.getElementById('downloadButton');
+
+        const MMR_RATE = 0.005;
+
+        function updateCard() {
+            const ticker = tickerInput.value.toUpperCase();
+            const entryPriceVal = entryPriceInput.value;
+            const markPriceVal = markPriceInput.value;
+
+            const entryPrice = parseFloat(entryPriceVal);
+            const markPrice = parseFloat(markPriceVal);
+            const positionType = positionTypeInput.value;
+            const leverage = parseInt(leverageInput.value);
+            const initialMargin = parseFloat(initialMarginInput.value);
+            const alertTag = alertTagInput.value;
+
+            if (positionType === 'long') {
+                cardLogo.textContent = 'B';
+                cardLogo.classList.remove('short');
+                cardLogo.classList.add('long');
+            } else {
+                cardLogo.textContent = 'S';
+                cardLogo.classList.remove('long');
+                cardLogo.classList.add('short');
+            }
+
+            if (isNaN(entryPrice) || isNaN(markPrice) || isNaN(leverage) || isNaN(initialMargin) || leverage <= 0 || initialMargin < 0 || entryPrice <= 0) {
+                cardPnl.textContent = '---';
+                cardPnl.className = 'value';
+                cardRoi.textContent = '---';
+                cardRoi.className = 'value';
+                cardSize.textContent = '---';
+                cardMargin.textContent = isNaN(initialMargin) ? '---' : initialMargin.toFixed(2);
+                cardMarginRatio.textContent = '---';
+                cardMarginRatio.className = 'value';
+                cardLiqPrice.textContent = '---';
+                const defaultPricePrecision = (entryPriceInput.value.split('.')[1] || '').length || 7;
+                cardEntryPrice.textContent = isNaN(entryPrice) ? '---' : entryPrice.toFixed(defaultPricePrecision);
+                cardMarkPrice.textContent = isNaN(markPrice) ? '---' : markPrice.toFixed(defaultPricePrecision);
+                return;
+            }
+
+            cardTickerName.textContent = ticker || 'N/A';
+            cardCrossLeverage.textContent = `Cross ${leverage}x`;
+            cardAlertTag.textContent = alertTag;
+
+            const entryPrecision = (entryPriceVal.split('.')[1] || '').length || 7;
+            const markPrecision = (markPriceVal.split('.')[1] || '').length || 7;
+            const priceDisplayPrecision = Math.max(entryPrecision, markPrecision, 5);
+
+
+            cardEntryPrice.textContent = entryPrice.toFixed(priceDisplayPrecision);
+            cardMarkPrice.textContent = markPrice.toFixed(priceDisplayPrecision);
+            cardMargin.textContent = initialMargin.toFixed(2);
+
+            const size = initialMargin * leverage;
+            cardSize.textContent = size.toFixed(4);
+
+            let pnl = 0;
+            if (positionType === 'long') {
+                pnl = ((markPrice - entryPrice) / entryPrice) * size;
+            } else {
+                pnl = ((entryPrice - markPrice) / entryPrice) * size;
+            }
+            cardPnl.textContent = pnl.toFixed(2);
+
+            let roi = 0;
+            if (initialMargin > 0) {
+                 roi = (pnl / initialMargin) * 100;
+            } else if (initialMargin === 0 && pnl !== 0) {
+                roi = pnl > 0 ? Infinity : -Infinity;
+            }
+            cardRoi.textContent = isFinite(roi) ? roi.toFixed(2) + '%' : (roi > 0 ? '∞%' : '-∞%');
+
+
+            [cardPnl, cardRoi].forEach(el => {
+                el.classList.remove('positive', 'negative');
+                const numericValue = parseFloat(el.textContent);
+                if (numericValue >= 0) {
+                    el.classList.add('positive');
+                } else {
+                    el.classList.add('negative');
+                }
+            });
+
+            let liqPrice = 0;
+            if (positionType === 'long') {
+                liqPrice = entryPrice * (1 - (1 / leverage) + MMR_RATE);
+            } else {
+                liqPrice = entryPrice * (1 + (1 / leverage));
+            }
+            cardLiqPrice.textContent = liqPrice > 0 ? liqPrice.toFixed(priceDisplayPrecision) : '---';
+
+            const currentEquity = initialMargin + pnl;
+            cardMarginRatio.classList.remove('positive', 'negative', 'liquidated');
+
+            if (currentEquity <= 0 && initialMargin > 0) {
+                cardMarginRatio.textContent = 'LIQUIDATED';
+                cardMarginRatio.classList.add('liquidated');
+            } else if (size > 0 && currentEquity > 0) {
+                const maintenanceMarginRequired = size * MMR_RATE;
+                const marginRatioVal = (maintenanceMarginRequired / currentEquity) * 100;
+                cardMarginRatio.textContent = marginRatioVal.toFixed(2) + '%';
+                if (pnl >= 0) {
+                    cardMarginRatio.classList.add('positive');
+                } else {
+                    cardMarginRatio.classList.add('negative');
+                }
+            } else {
+                cardMarginRatio.textContent = '---';
+            }
+        }
+
+        [tickerInput, entryPriceInput, markPriceInput, positionTypeInput, leverageInput, initialMarginInput, alertTagInput].forEach(input => {
+            input.addEventListener('input', updateCard);
+            input.addEventListener('change', updateCard);
+        });
+
+        downloadButton.addEventListener('click', () => {
+            const cardElement = document.getElementById('tradingCard');
+            html2canvas(cardElement, {
+                backgroundColor: cardElement.style.backgroundColor || '#1e2329',
+                scale: 3,
+                useCORS: true,
+                logging: false
+            }).then(canvas => {
+                const link = document.createElement('a');
+                const tickerNameForFile = cardTickerName.textContent.replace('/', '-') || "trade";
+                const positionTypeForFile = positionTypeInput.value;
+                link.download = `${tickerNameForFile}_${positionTypeForFile}_${cardCrossLeverage.textContent.replace(' ','')}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }).catch(err => {
+                console.error("Error generating canvas:", err);
+                alert("Error generating image. Check console for details.");
+            });
+        });
+
+        positionTypeInput.value = 'short';
+        tickerInput.value = "CETUSUSDT";
+        entryPriceInput.value = "0.3613000";
+        markPriceInput.value = "0.3420000";
+        leverageInput.value = "20";
+        initialMarginInput.value = "738.50";
+        alertTagInput.value = "!!!!";
+        updateCard();
+    </script>
+</body>
+</html>
