@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- *** यह लाइन प्रॉब्लम को फिक्स करती है *** -->
     <meta name="viewport" content="width=420, initial-scale=1.0">
     <title>Trading Card Generator - V4</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -86,20 +85,21 @@
             background-color: #357ABD;
         }
 
+        /* --- MODIFIED --- */
         .card {
-            width: 408px;
-            height: 292px;
+            width: 540px; /* Changed from 408px */
+            height: 332px; /* Changed from 292px */
             background-color: #1e2329;
             color: #adb5bd;
-            padding: 16px;
-            border-radius: 6px;
+            padding: 18px; /* Slightly increased padding */
+            border-radius: 8px; /* Slightly increased radius */
             box-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 2px 5px rgba(0,0,0,0.15);
             font-size: 13px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 16px; /* Increased gap */
             box-sizing: border-box;
-            flex-shrink: 0; /* Prevents the card from shrinking */
+            flex-shrink: 0;
         }
 
         .card-header {
@@ -109,12 +109,12 @@
 
         .card-header .logo {
             color: white;
-            padding: 4px 9px;
-            border-radius: 3px;
-            font-weight: 600;
-            font-size: 15px;
+            padding: 5px 10px; /* Adjusted padding */
+            border-radius: 4px; /* Adjusted radius */
+            font-weight: 500; /* Changed from 600 */
+            font-size: 16px; /* Adjusted size */
             line-height: 1;
-            margin-right: 8px;
+            margin-right: 10px; /* Adjusted margin */
             flex-shrink: 0;
         }
         .logo.short { background-color: #ef454a; }
@@ -123,41 +123,41 @@
         .card-header .ticker-info-wrapper {
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             flex-grow: 1;
             overflow: hidden;
         }
 
         .card-header .ticker-name {
-            font-weight: 500;
-            font-size: 15px;
+            font-weight: 400; /* Changed from 500 */
+            font-size: 16px; /* Adjusted size */
             color: #e9ecef;
             white-space: nowrap;
         }
 
         .card-header .tag {
             background-color: #2a3038;
-            padding: 2.5px 5px;
+            padding: 3px 6px;
             border-radius: 3px;
-            font-size: 11px;
+            font-size: 12px; /* Adjusted size */
             color: #868e96;
-            font-weight: 500;
+            font-weight: 400; /* Changed from 500 */
             white-space: nowrap;
         }
         .card-header .alert-tag {
             background-color: #3b4046;
             color: #ffc107;
-            font-weight: 600;
+            font-weight: 500; /* Changed from 600 */
         }
 
         .card-header .share-icon {
             margin-left: auto;
-            padding-left: 8px;
+            padding-left: 10px;
             flex-shrink: 0;
         }
         .card-header .share-icon svg {
-            width: 17px;
-            height: 17px;
+            width: 18px; /* Adjusted size */
+            height: 18px; /* Adjusted size */
             fill: #6c757d;
         }
 
@@ -165,14 +165,14 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            padding-top: 4px;
+            padding-top: 5px;
         }
 
         .pnl-roi-section .item .label,
         .details-grid .item .label {
-            font-size: 11.5px;
+            font-size: 12.5px; /* Adjusted size */
             color: #868e96;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             font-weight: 400;
             display: inline-block;
         }
@@ -182,9 +182,10 @@
             padding-bottom: 3px;
         }
         
+        /* --- MODIFIED --- */
         .pnl-roi-section .item .value {
-            font-size: 23px;
-            font-weight: 600;
+            font-size: 22px; /* Changed from 23px */
+            font-weight: 500; /* Changed from 600 */
             line-height: 1.1;
         }
         .pnl-roi-section > .item:last-child { text-align: right; }
@@ -199,39 +200,40 @@
         .details-grid {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
-            gap: 14px 10px;
-            padding-top: 4px;
+            gap: 16px 12px; /* Adjusted gap */
+            padding-top: 5px;
         }
         
         .details-grid .item {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 3px;
         }
 
+        /* --- MODIFIED --- */
         .details-grid .item .value {
-            font-size: 13.5px;
+            font-size: 14px; /* Adjusted size */
             color: #dee2e6;
-            font-weight: 500;
+            font-weight: 400; /* Changed from 500 */
         }
         
         .action-buttons {
             display: flex;
             justify-content: space-between;
-            gap: 8px;
+            gap: 10px; /* Adjusted gap */
             margin-top: auto;
         }
 
         .action-buttons button {
             flex-grow: 1;
-            padding: 9px;
+            padding: 10px; /* Adjusted padding */
             background-color: #343a40;
             color: #adb5bd;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 14px; /* Adjusted size */
+            font-weight: 400; /* Changed from 500 */
             transition: background-color 0.2s;
             text-align: center;
         }
@@ -339,7 +341,7 @@
     </div>
 
     <script>
-        // ... (Javascript is unchanged) ...
+        // ... (Javascript logic remains mostly the same) ...
         const tickerInput = document.getElementById('tickerInput');
         const entryPriceInput = document.getElementById('entryPriceInput');
         const markPriceInput = document.getElementById('markPriceInput');
@@ -478,15 +480,16 @@
             input.addEventListener('change', updateCard);
         });
 
+        /* --- MODIFIED --- */
         downloadButton.addEventListener('click', () => {
             const cardElement = document.getElementById('tradingCard');
             html2canvas(cardElement, {
                 backgroundColor: cardElement.style.backgroundColor || '#1e2329',
-                scale: 3,
+                scale: 2, // Changed from 3
                 useCORS: true,
                 logging: false,
-                width: 408, // Ensure canvas has correct width
-                height: 292 // Ensure canvas has correct height
+                width: 540,  // Changed from 408
+                height: 332 // Changed from 292
             }).then(canvas => {
                 const link = document.createElement('a');
                 const tickerNameForFile = cardTickerName.textContent.replace('/', '-') || "trade";
@@ -500,6 +503,7 @@
             });
         });
 
+        // Initialize with default values
         positionTypeInput.value = 'short';
         tickerInput.value = "CETUSUSDT";
         entryPriceInput.value = "0.3613000";
